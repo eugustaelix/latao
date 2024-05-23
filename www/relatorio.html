@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'" />
+    <script src="cordova.js"></script>
+    <script src="components/loader.js"></script>
+    <link rel="stylesheet" href="components/loader.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Relatório de Assentos</title>
+    <style>
+        body {
+            background-image: url("relatorio.jpg");
+            background-attachment: fixed;
+            background-repeat: repeat;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            color: black;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid whitesmoke;
+        }
+
+        th {
+            background-color: #fe0101;
+            color: white;
+            border: none;
+        }
+
+        .disponivel {
+            font-style: italic;
+            color: green;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-container input[type=text] {
+            width: 70%;
+            padding: 10px;
+            margin-top: 15%;
+            font-size: 17px;
+            border: none;
+            border-radius: 5px;
+            left: 50%;
+
+            transform: translate(-50%);
+        }
+    </style>
+</head>
+
+<body>
+    <button class="ajuda" onclick="window.location.href = 'index.html'"><i class="fa fa-arrow-left icone"></i></button>
+    <div class="search-container">
+        <input type="text" id="myInput" onkeyup="searchTable()">
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Assento</th>
+                <th colspan="2">Nome e Preço</th>
+            </tr>
+        </thead>
+        <tbody id="dadosTabela">
+            <!-- Os dados serão preenchidos aqui -->
+        </tbody>
+    </table>
+
+    <script>
+        window.onload = function () {
+            const letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+            const numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            const tabela = document.getElementById('dadosTabela');
+
+            letras.forEach(letra => {
+                numeros.forEach(numero => {
+                    const assento = `${letra}${numero}`;
+                    const dadosAssento = JSON.parse(localStorage.getItem(assento));
+
+                    const newRow = tabela.insertRow();
+                    newRow.insertCell(0).textContent = assento;
+
+                    if (dadosAssento) {
+                        newRow.insertCell(1).textContent = dadosAssento.nome;
+                        newRow.insertCell(2).textContent = dadosAssento.preco;
+                    } else {
+                        const cell = newRow.insertCell(1);
+                        cell.textContent = 'Disponível';
+                        cell.classList.add('disponivel');
+                        cell.colSpan = 2;
+                    }
+                });
+            });
+        }
+
+        function searchTable() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("dadosTabela");
+            tr = table.getElementsByTagName("tr");
+            for (i = 0; i < tr.length; i++) {
+                var found = false;
+                td = tr[i].getElementsByTagName("td");
+                for (var j = 0; j < td.length; j++) {
+                    if (td[j]) {
+                        txtValue = td[j].textContent || td[j].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if (found) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

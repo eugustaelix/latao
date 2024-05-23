@@ -1,29 +1,325 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'" />
     <script src="cordova.js"></script>
     <script src="components/loader.js"></script>
-    <link rel="stylesheet" href="components/loader.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="components/loader.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script>
-        // Animação ao entrar no aplicativo
-        window.onload = function() {
-             document.getElementById('carregamento').style.opacity = '1';
-            setTimeout(function() {
-                document.getElementById('carregamento').style.opacity = '0';
-            }, 3500);}
+window.onload = function () {
+    if (!sessionStorage.getItem('animationShown')) {
+        localStorage.clear();
+        document.getElementById('carregamento').style.opacity = '1';
+        setTimeout(function () {
+            document.getElementById('carregamento').style.opacity = '0';
+            setTimeout(function () {
+                document.getElementById('carregamento').style.display = 'none';
+            }, 500);
+        }, 3500);
+        sessionStorage.setItem('animationShown', 'true');
+    } else {
+        document.getElementById('carregamento').style.display = 'none';
+    }
+}
+
+        document.addEventListener('click', function (event) {
+            const nomeDiv = document.getElementById('nomeDiv');
+            if (!nomeDiv.contains(event.target) && event.target.tagName !== 'BUTTON' && !event.target.matches('li')) {
+                fecharDiv();
+            }
+        });
+
+        function fecharDiv() {
+            const nomeDiv = document.getElementById('nomeDiv');
+            const overlay = document.getElementById('overlay');
+            nomeDiv.style.opacity = '0';
+            overlay.style.opacity = '0';
+            setTimeout(function () {
+                nomeDiv.style.display = 'none';
+                overlay.style.display = 'none';
+            }, 310);
+            document.getElementById('salvarNome').value = ''; // Limpa o campo
+        }
+
+function verificarAssento(li) {
+    const assento = li.getAttribute('data-assento');
+    const nomeSalvo = localStorage.getItem(assento);
+
+    if (nomeSalvo) {
+        const dadosObjeto = JSON.parse(nomeSalvo);
+        const nomeOcupante = dadosObjeto.nome;
+        avisoOcupado(nomeOcupante);
+    } else {
+        mostrarDiv(li);
+    }
+}
+
+        function mostrarDiv(li) {
+            const nomeDiv = document.getElementById('nomeDiv');
+            const overlay = document.getElementById('overlay');
+            nomeDiv.style.display = "grid";
+            overlay.style.display = "block";
+            setTimeout(function () {
+                nomeDiv.style.opacity = '1';
+                overlay.style.opacity = '1';
+            }, 10);
+
+            const assentoLabel = document.getElementById('assentoLabel');
+            const novoAssento = li.getAttribute('data-assento');
+            assentoLabel.textContent = `Assento ${novoAssento} |`;
+
+            // Calcular o preço e atualizar a label de preço
+            calcularPreco(novoAssento);
+        }
+
+        function pressionarBotao() {
+            var button = document.querySelector('.button');
+            button.classList.add('active');
+
+            setTimeout(function () {
+                button.classList.remove('active');
+            }, 1000);
+        }
+
+        function salvar() {
+            var salvarNome = document.getElementById("salvarNome").value;
+            var assento = document.getElementById("assentoLabel").textContent.split(" ")[1];
+            var preco = document.getElementById("preco").textContent;
+
+            var dadosAssento = {
+                nome: salvarNome,
+                preco: preco
+            };
+
+            localStorage.setItem(assento, JSON.stringify(dadosAssento));
+            fecharDiv();
+            mensagemSalvocomSucesso();
+        }
+        function calcularPreco(assento) {
+            const basePreco = 1000;
+            const setoresDesconto = ['D', 'E', 'F', 'G'];
+            const baseDesconto = 0.05;
+            const terminaComDesconto = [4, 5, 6];
+            const terminaComAumento = [1, 9];
+            const terminaComDecrescimo = [2, 5, 8];
+
+            let preresultado;
+            const letra = assento.charAt(0);
+            const numero = parseInt(assento.charAt(1));
+
+            if (terminaComDesconto.includes(numero)) {
+                preresultado = 800;
+            } else {
+                preresultado = basePreco;
+            }
+
+            if (setoresDesconto.includes(letra)) {
+                preresultado += preresultado * baseDesconto;
+            }
+
+            let precoOficial = preresultado;
+
+            if (terminaComAumento.includes(numero)) {
+                precoOficial += preresultado * 0.5;
+            } else if (terminaComDecrescimo.includes(numero)) {
+                precoOficial -= preresultado * 0.2;
+            }
+
+            const precoLabel = document.getElementById('preco');
+            precoLabel.textContent = `${precoOficial.toFixed(2)}`;
+            const precoFormatado = precoOficial.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            // Atualizar o texto do elemento
+            precoLabel.textContent = precoFormatado;
+        }
+
+        function mensagemSalvocomSucesso() {
+            var notification = document.getElementById('notification');
+            var progressBar = document.getElementById('progresso');
+
+            // Reiniciar a largura da barra de progresso para 0
+            progressBar.style.width = '0';
+
+            // Adicionar a classe de animação
+            progressBar.style.animation = 'progress 2s linear forwards';
+
+            notification.classList.add('show');
+
+            setTimeout(function () {
+                notification.classList.remove('show');
+                progressBar.style.width = '0';
+                setTimeout(function () {
+                    progressBar.style.animation = 'none';
+                }, 100);
+            }, 2000);
+        }
+
+                function avisoOcupado(nome) {
+            var notification = document.getElementById('notification');
+            var progressBar = document.getElementById('progresso');
+                        var mensagem = document.getElementById('mensagemtoast');
+        notification.style.backgroundColor = 'red';
+            mensagem.textContent = `${nome} está neste lugar!`;
+            // Reiniciar a largura da barra de progresso para 0
+            progressBar.style.width = '0';
+
+            // Adicionar a classe de animação
+            progressBar.style.animation = 'progress 2s linear forwards';
+
+            notification.classList.add('show');
+
+            setTimeout(function () {
+                notification.classList.remove('show');
+                progressBar.style.width = '0';
+                setTimeout(function () {
+                    progressBar.style.animation = 'none';
+                    mensagem.textContent = 'Salvo com Sucesso!';
+                    notification.style.backgroundColor = '#18bb20';
+                }, 200);
+                
+                                
+            }, 2000);
+            
+        }
+
     </script>
 </head>
-<body style="background-color: #25327b">
-	<br />
-    Teste
+
+<body>
+    <button class="relatorio" onclick="window.location.href = 'relatorio.html'"><i class="fa fa-file"></i>&nbsp; Gerar Relatório</button>
+    <!-- <button class="ajuda"><i class="fa fa-question icone"></i></button> DESCONTINUADO POR FALTA DE TEMPO -->
+    <div class="nome" id="nomeDiv">
+        <label id="assentoLabel" class="assento"></label>
+        <label id="preco" class="preco"></label>
+        <label> Insira seu Nome:</label>
+        <input type="text" id="salvarNome">
+        <button class="button" ontouchstart="pressionarBotao()" onclick="salvar()"><i
+                class="fa fa-check icone"></i></button>
+    </div>
+
+    <div id="notification" class="toast">
+        <div class="toast-content">
+            <span id="mensagemtoast" class="toast-message">Salvo com Sucesso!</span>
+            <div class="progress-bar" id="progresso"></div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <li style="top: 690px; left: 36px" data-assento="A1" onclick="verificarAssento(this)"></li>
+    <li style="top: 629px; left: 36px" data-assento="B1" onclick="verificarAssento(this)"></li>
+    <li style="top: 567px; left: 36px" data-assento="C1" onclick="verificarAssento(this)"></li>
+    <li style="top: 504px; left: 36px" data-assento="D1" onclick="verificarAssento(this)"></li>
+    <li style="top: 442px; left: 36px" data-assento="E1" onclick="verificarAssento(this)"></li>
+    <li style="top: 380px; left: 36px" data-assento="F1" onclick="verificarAssento(this)"></li>
+    <li style="top: 316px; left: 36px" data-assento="G1" onclick="verificarAssento(this)"></li>
+    <li style="top: 254px; left: 36px" data-assento="H1" onclick="verificarAssento(this)"></li>
+    <li style="top: 191px; left: 36px" data-assento="I1" onclick="verificarAssento(this)"></li>
+    <li style="top: 127px; left: 36px" data-assento="J1" onclick="verificarAssento(this)"></li>
+    <br />
+
+    <li style="top: 690px; left: 70px" data-assento="A2" onclick="verificarAssento(this)"></li>
+    <li style="top: 629px; left: 70px" data-assento="B2" onclick="verificarAssento(this)"></li>
+    <li style="top: 567px; left: 70px" data-assento="C2" onclick="verificarAssento(this)"></li>
+    <li style="top: 504px; left: 70px" data-assento="D2" onclick="verificarAssento(this)"></li>
+    <li style="top: 442px; left: 70px" data-assento="E2" onclick="verificarAssento(this)"></li>
+    <li style="top: 380px; left: 70px" data-assento="F2" onclick="verificarAssento(this)"></li>
+    <li style="top: 316px; left: 70px" data-assento="G2" onclick="verificarAssento(this)"></li>
+    <li style="top: 254px; left: 70px" data-assento="H2" onclick="verificarAssento(this)"></li>
+    <li style="top: 191px; left: 70px" data-assento="I2" onclick="verificarAssento(this)"></li>
+    <li style="top: 127px; left: 70px" data-assento="J2" onclick="verificarAssento(this)"></li>
+
+    <li style="top: 690px; left: 103px" data-assento="A3" onclick="verificarAssento(this)"></li>
+    <li style="top: 629px; left: 103px" data-assento="B3" onclick="verificarAssento(this)"></li>
+    <li style="top: 567px; left: 103px" data-assento="C3" onclick="verificarAssento(this)"></li>
+    <li style="top: 504px; left: 103px" data-assento="D3" onclick="verificarAssento(this)"></li>
+    <li style="top: 442px; left: 103px" data-assento="E3" onclick="verificarAssento(this)"></li>
+    <li style="top: 380px; left: 103px" data-assento="F3" onclick="verificarAssento(this)"></li>
+    <li style="top: 316px; left: 103px" data-assento="G3" onclick="verificarAssento(this)"></li>
+    <li style="top: 254px; left: 103px" data-assento="H3" onclick="verificarAssento(this)"></li>
+    <li style="top: 191px; left: 103px" data-assento="I3" onclick="verificarAssento(this)"></li>
+    <li style="top: 127px; left: 103px" data-assento="J3" onclick="verificarAssento(this)"></li>
+
+    <li style="top: 690px; left: 166px" data-assento="A4" onclick="verificarAssento(this)"></li>
+    <li style="top: 629px; left: 166px" data-assento="B4" onclick="verificarAssento(this)"></li>
+    <li style="top: 567px; left: 166px" data-assento="C4" onclick="verificarAssento(this)"></li>
+    <li style="top: 504px; left: 166px" data-assento="D4" onclick="verificarAssento(this)"></li>
+    <li style="top: 442px; left: 166px" data-assento="E4" onclick="verificarAssento(this)"></li>
+    <li style="top: 380px; left: 166px" data-assento="F4" onclick="verificarAssento(this)"></li>
+    <li style="top: 316px; left: 166px" data-assento="G4" onclick="verificarAssento(this)"></li>
+    <li style="top: 254px; left: 166px" data-assento="H4" onclick="verificarAssento(this)"></li>
+    <li style="top: 191px; left: 166px" data-assento="I4" onclick="verificarAssento(this)"></li>
+    <li style="top: 127px; left: 166px" data-assento="J4" onclick="verificarAssento(this)"></li>
+
+    <li style="top: 690px; left: 199px" data-assento="A5" onclick="verificarAssento(this)"></li>
+    <li style="top: 629px; left: 199px" data-assento="B5" onclick="verificarAssento(this)"></li>
+    <li style="top: 567px; left: 199px" data-assento="C5" onclick="verificarAssento(this)"></li>
+    <li style="top: 504px; left: 199px" data-assento="D5" onclick="verificarAssento(this)"></li>
+    <li style="top: 442px; left: 199px" data-assento="E5" onclick="verificarAssento(this)"></li>
+    <li style="top: 380px; left: 199px" data-assento="F5" onclick="verificarAssento(this)"></li>
+    <li style="top: 316px; left: 199px" data-assento="G5" onclick="verificarAssento(this)"></li>
+    <li style="top: 254px; left: 199px" data-assento="H5" onclick="verificarAssento(this)"></li>
+    <li style="top: 191px; left: 199px" data-assento="I5" onclick="verificarAssento(this)"></li>
+    <li style="top: 127px; left: 199px" data-assento="J5" onclick="verificarAssento(this)"></li>
+
+    <li style="top: 690px; left: 233px" data-assento="A6" onclick="verificarAssento(this)"></li>
+    <li style="top: 629px; left: 233px" data-assento="B6" onclick="verificarAssento(this)"></li>
+    <li style="top: 567px; left: 233px" data-assento="C6" onclick="verificarAssento(this)"></li>
+    <li style="top: 504px; left: 233px" data-assento="D6" onclick="verificarAssento(this)"></li>
+    <li style="top: 442px; left: 233px" data-assento="E6" onclick="verificarAssento(this)"></li>
+    <li style="top: 380px; left: 233px" data-assento="F6" onclick="verificarAssento(this)"></li>
+    <li style="top: 316px; left: 233px" data-assento="G6" onclick="verificarAssento(this)"></li>
+    <li style="top: 254px; left: 233px" data-assento="H6" onclick="verificarAssento(this)"></li>
+    <li style="top: 191px; left: 233px" data-assento="I6" onclick="verificarAssento(this)"></li>
+    <li style="top: 127px; left: 233px" data-assento="J6" onclick="verificarAssento(this)"></li>
+
+    <li style="top: 690px; left: 293px" data-assento="A7" onclick="verificarAssento(this)"></li>
+    <li style="top: 629px; left: 293px" data-assento="B7" onclick="verificarAssento(this)"></li>
+    <li style="top: 567px; left: 293px" data-assento="C7" onclick="verificarAssento(this)"></li>
+    <li style="top: 504px; left: 293px" data-assento="D7" onclick="verificarAssento(this)"></li>
+    <li style="top: 442px; left: 293px" data-assento="E7" onclick="verificarAssento(this)"></li>
+    <li style="top: 380px; left: 293px" data-assento="F7" onclick="verificarAssento(this)"></li>
+    <li style="top: 316px; left: 293px" data-assento="G7" onclick="verificarAssento(this)"></li>
+    <li style="top: 254px; left: 293px" data-assento="H7" onclick="verificarAssento(this)"></li>
+    <li style="top: 191px; left: 293px" data-assento="I7" onclick="verificarAssento(this)"></li>
+    <li style="top: 127px; left: 293px" data-assento="J7" onclick="verificarAssento(this)"></li>
+
+    <li style="top: 690px; left: 326px" data-assento="A8" onclick="verificarAssento(this)"></li>
+    <li style="top: 629px; left: 326px" data-assento="B8" onclick="verificarAssento(this)"></li>
+    <li style="top: 567px; left: 326px" data-assento="C8" onclick="verificarAssento(this)"></li>
+    <li style="top: 504px; left: 326px" data-assento="D8" onclick="verificarAssento(this)"></li>
+    <li style="top: 442px; left: 326px" data-assento="E8" onclick="verificarAssento(this)"></li>
+    <li style="top: 380px; left: 326px" data-assento="F8" onclick="verificarAssento(this)"></li>
+    <li style="top: 316px; left: 326px" data-assento="G8" onclick="verificarAssento(this)"></li>
+    <li style="top: 254px; left: 326px" data-assento="H8" onclick="verificarAssento(this)"></li>
+    <li style="top: 191px; left: 326px" data-assento="I8" onclick="verificarAssento(this)"></li>
+    <li style="top: 127px; left: 326px" data-assento="J8" onclick="verificarAssento(this)"></li>
+
+    <li style="top: 690px; left: 359px" data-assento="A9" onclick="verificarAssento(this)"></li>
+    <li style="top: 629px; left: 359px" data-assento="B9" onclick="verificarAssento(this)"></li>
+    <li style="top: 567px; left: 359px" data-assento="C9" onclick="verificarAssento(this)"></li>
+    <li style="top: 504px; left: 359px" data-assento="D9" onclick="verificarAssento(this)"></li>
+    <li style="top: 442px; left: 359px" data-assento="E9" onclick="verificarAssento(this)"></li>
+    <li style="top: 380px; left: 359px" data-assento="F9" onclick="verificarAssento(this)"></li>
+    <li style="top: 316px; left: 359px" data-assento="G9" onclick="verificarAssento(this)"></li>
+    <li style="top: 254px; left: 359px" data-assento="H9" onclick="verificarAssento(this)"></li>
+    <li style="top: 191px; left: 359px" data-assento="I9" onclick="verificarAssento(this)"></li>
+    <li style="top: 127px; left: 359px" data-assento="J9" onclick="verificarAssento(this)"></li>
+
+
     <!-- Animação ao entrar no aplicativo (imagem e avião): -->
     <div id="carregamento" class="imagem">
-    <img src="carregamento.jpg">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -20 616 552" class="aviao"><path d="M482.3 192c34.2 0 93.7 29 93.7 64c0 36-59.5 64-93.7 64l-116.6 0L265.2 495.9c-5.7 10-16.3 16.1-27.8 16.1l-56.2 0c-10.6 0-18.3-10.2-15.4-20.4l49-171.6L112 320 68.8 377.6c-3 4-7.8 6.4-12.8 6.4l-42 0c-7.8 0-14-6.3-14-14c0-1.3 .2-2.6 .5-3.9L32 256 .5 145.9c-.4-1.3-.5-2.6-.5-3.9c0-7.8 6.3-14 14-14l42 0c5 0 9.8 2.4 12.8 6.4L112 192l102.9 0-49-171.6C162.9 10.2 170.6 0 181.2 0l56.2 0c11.5 0 22.1 6.2 27.8 16.1L365.7 192l116.6 0z"/></svg>
-        </div>
+        <img src="carregamento.jpg" />
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -20 616 552" class="aviao">
+            <path
+                d="M482.3 192c34.2 0 93.7 29 93.7 64c0 36-59.5 64-93.7 64l-116.6 0L265.2 495.9c-5.7 10-16.3 16.1-27.8 16.1l-56.2 0c-10.6 0-18.3-10.2-15.4-20.4l49-171.6L112 320 68.8 377.6c-3 4-7.8 6.4-12.8 6.4l-42 0c-7.8 0-14-6.3-14-14c0-1.3 .2-2.6 .5-3.9L32 256 .5 145.9c-.4-1.3-.5-2.6-.5-3.9c0-7.8 6.3-14 14-14l42 0c5 0 9.8 2.4 12.8 6.4L112 192l102.9 0-49-171.6C162.9 10.2 170.6 0 181.2 0l56.2 0c11.5 0 22.1 6.2 27.8 16.1L365.7 192l116.6 0z" />
+        </svg>
+    </div>
 </body>
+
 </html>

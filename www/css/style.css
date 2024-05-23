@@ -1,38 +1,277 @@
 /**/
- img {
-    height: 107%;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 1;
+/* Fonte: */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+body {
+  font-family: "Inter", sans-serif;
+  background-image: url("inicio.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+li {
+  opacity: 0;
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  cursor: pointer;
+  z-index: 0;
+  text-align-last: right;
+}
+
+li:focus {
+  outline: none;
+}
+
+.nome {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.nome.visible {
+  display: grid;
+  opacity: 1;
+}
+
+/* Remove o destaque azul ao ser clicado em dispositivos móveis */
+li:active {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active {
+  -webkit-tap-highlight-color: transparent;
+}
+
+input {
+  border: 1px solid #25327b;
+  outline: #25327b;
+  border-radius: 5px;
+  width: 200px;
+  height: 25px;
+  font-size: 25px;
+  padding: 5px;
+  margin: 10px;
+  position: relative;
+  left: 45%;
+  transform: translate(-50%);
+}
+
+.button {
+  border-radius: 30px;
+  border: none;
+  outline: none;
+  background: #fe0101;
+  left: 30%;
+  color: white;
+  text-align: center;
+  justify-content: center;
+  width: 150px;
+  height: 40px;
+  position: relative;
+  left: 50%;
+  transform: translate(-50%);
+  box-shadow: 0px 0px 3px rgba(255, 0, 0, 0.5);
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+
+.ajuda {
+  border-radius: 60px;
+  border: none;
+  outline: none;
+  background: #fe0101;
+  color: white;
+  text-align: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  position: absolute;
+  left: 93%;
+  transform: translate(-50%);
+  box-shadow: 0px 0px 3px rgba(255, 0, 0, 0.5);
+  transition: 0.3s ease;
+}
+
+.button.active {
+  box-shadow: 0px 0px 3px rgba(37, 50, 123, 0.5);
+  background: #25327b;
+}
+
+.icone {
+  font-size: 20px !important;
+}
+
+.preco,
+.assento {
+  display: contents;
+  font-weight: bold;
+}
+
+label {
+  color: black;
+  justify-content: center;
+  display: flex;
+  font-size: 23px;
+}
+
+.nome {
+  display: none;
+  opacity: 0;
+  background: white;
+  width: 80%;
+  color: black;
+  height: 180px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 20px;
+  box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.1);
+  justify-content: center;
+  padding: 15px 5px;
+  transition: 0.5s;
+  z-index: 9999;
+}
+
+.notification {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #18bb20;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  top: 3%;
+  height: 2%;
+  width: 70%;
+}
+
+.toast.show {
+  opacity: 1;
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-message {
+  flex: none;
+}
+
+.progress-bar {
+  height: 4px;
+  width: 100%;
+  background-color: #fff;
+  margin-top: 5px;
+  width: 0;
+  /* Inicialmente a largura é 0 */
+  border-radius: 2px;
+  animation: none;
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 72%;
+
+}
+
+@keyframes progress {
+  0% {
+    width: 0;
   }
 
-  .imagem {
-      transition: 0.5s;
-      opacity: 1;
+  100% {
+    width: 100%;
   }
-  .aviao {
-    --pathlength: 1384;
-    width: 70px;
-    position: absolute;
-    top: 700px;
-    left: 50%;
-    transform: translate(-50%);
-    fill: transparent;
-    stroke: white;
-    stroke-linecap: round;
-    stroke-width: 15px;
-    stroke-dasharray: 0 var(--pathlength);
-    animation: loader 4.5s cubic-bezier(.5, .1, .5, 1) infinite both;
-    transition: 0.5s;
-    opacity: 1;
-  }
+}
 
-  @keyframes loader {
-    90%,
-    100% {
-      stroke-dashoffset: 0;
-      stroke-dasharray: var(--pathlength) 0;
-    }
+img {
+  height: 107%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 1;
+}
+
+.imagem {
+  transition: 0.5s;
+  opacity: 1;
+}
+
+.aviao {
+  --pathlength: 1384;
+  width: 70px;
+  position: absolute;
+  top: 700px;
+  left: 50%;
+  transform: translate(-50%);
+  fill: transparent;
+  stroke: white;
+  stroke-linecap: round;
+  stroke-width: 15px;
+  stroke-dasharray: 0 var(--pathlength);
+  animation: loader 4.5s cubic-bezier(.5, .1, .5, 1) infinite both;
+  transition: 0.5s;
+  z-index: 9999;
+  opacity: 1;
+}
+
+@keyframes loader {
+
+  90%,
+  100% {
+    stroke-dashoffset: 0;
+    stroke-dasharray: var(--pathlength) 0;
   }
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  display: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+  z-index: 9998;
+  /* Deve ser menor que o z-index do pop-up */
+}
+
+.overlay.visible {
+  display: block;
+  opacity: 1;
+}
+
+.relatorio {
+  font-size: 18px;
+  width: 60%;
+  background-color: red;
+  color: #fff;
+  text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  border: 0;
+  cursor: pointer;
+  letter-spacing: 1px;
+  padding: 0.8rem 1.5rem;
+  border-radius: 25px;
+  box-shadow: 0px 0px 5px rgba(255, 0, 0, 0.5);
+  left: 50%;
+  transform: translate(-50%);
+  top: 93%;
+  position: absolute;
+}
